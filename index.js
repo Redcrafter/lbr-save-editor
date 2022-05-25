@@ -2,6 +2,37 @@ let currentSave;
 
 const leaves = [
   {
+    name: "Gems",
+    id: "gems",
+    img: "spr_resource_gem_0.png",
+  },
+  {
+    name: "Silver token",
+    id: "silver_token",
+    img: "silver_token.png",
+  },
+  {
+    name: "Gold token",
+    id: "gold_token",
+    img: "gold_token.png",
+  },
+  {
+    name: "Coins",
+    id: "coins",
+    img: "spr_gold_0.png",
+  },
+  {
+    name: "BLC",
+    id: "blc",
+    img: "spr_blc_0.png",
+  },
+  {
+    name: "MLC",
+    id: "mlc",
+    img: "spr_mlc_0.png",
+  },
+  {},
+  {
     name: "Normal",
     id: "leaves",
     img: "spr_leaf_0.png",
@@ -86,6 +117,26 @@ const leaves = [
     id: "ancient",
     img: "",
   },
+  {
+    name: "Sacred Leaves",
+    id: "sacred",
+    img: "",
+  },
+  {
+    name: "Biotite Leaves",
+    id: "biotite",
+    img: "",
+  },
+  {
+    name: "Malachite Leaves",
+    id: "malachite",
+    img: "",
+  },
+  {
+    name: "Hematite Leaves",
+    id: "hematite",
+    img: "",
+  },
   {},
   {
     name: "Amber",
@@ -121,22 +172,6 @@ const leaves = [
     name: "Tektite",
     id: "tektite",
     img: "spr_leaf_tektite_0.png",
-  },
-  {},
-  {
-    name: "Coins",
-    id: "coins",
-    img: "spr_gold_0.png",
-  },
-  {
-    name: "BLC",
-    id: "blc",
-    img: "spr_blc_0.png",
-  },
-  {
-    name: "MLC",
-    id: "mlc",
-    img: "spr_mlc_0.png",
   },
   {},
   {
@@ -176,14 +211,9 @@ const leaves = [
   },
   {},
   {
-    name: "Gems",
-    id: "gems",
-    img: "spr_resource_gem_0.png",
-  },
-  {
-    name: "Cheese",
-    id: "cheese",
-    img: "cheese.png",
+    name: "Challenge Points",
+    id: "cp",
+    img: "spr_cp.png",
   },
   {
     name: "Borbs",
@@ -191,24 +221,24 @@ const leaves = [
     img: "borb.png",
   },
   {
+    name: "Cheese",
+    id: "cheese",
+    img: "cheese.png",
+  },
+  {
     name: "Beer",
     id: "beer",
     img: "",
   },
   {
-    name: "Silver token",
-    id: "silver_token",
-    img: "silver_token.png",
+    name: "Mulch",
+    id: "mulch",
+    img: "",
   },
   {
-    name: "Gold token",
-    id: "gold_token",
-    img: "gold_token.png",
-  },
-  {
-    name: "Challenge Points",
-    id: "cp",
-    img: "spr_cp.png",
+    name: "Shards",
+    id: "shards",
+    img: "",
   },
 ];
 
@@ -370,6 +400,7 @@ function processSave(currentSave) {
         unlocked: 0,
         unlocked_fruit: 0,
       };
+      leaf.name += " (new)";
     }
 
     let img = document.createElement("img");

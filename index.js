@@ -256,6 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("saveButton").addEventListener("click", save);
+  document.getElementById("saveRawButton").addEventListener("click", saveRaw);
 });
 
 /** @param  {...number} items */

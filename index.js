@@ -514,11 +514,11 @@ function processSave(currentSave) {
         function makeIn(name) {
             let el = document.createElement("input");
             el.type = "number";
-            el.value = item[name];
+            el.valueAsNumber = item[name];
             el.style.width = "50px";
 
             el.addEventListener("change", () => {
-                item[name] = value;
+                item[name] = el.valueAsNumber;
             });
 
             return el;

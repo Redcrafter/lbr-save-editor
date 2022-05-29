@@ -53,7 +53,7 @@
         This is an online save editor for the <a
             href="https://store.steampowered.com/app/1468260/Leaf_Blower_Revolution__Idle_Game/">Leaf Blower
             Revolution</a> game.
-        It is not affiliated with the game or its developer. <b>Using this tool in multiplayer modes can result in a ban.</b>
+        It is not affiliated with the game or its developer. <b>Using this tool in multiplayer modes may result in a ban.</b>
     </p>
     <h2>How to use</h2>
     <p>
@@ -62,11 +62,13 @@
         file. Once finished editing, you can download the file and replace the old <code>save.dat</code> file with it.
         </li>
     </p>
-    <p> Alternatively, you can download the raw data after uploading your <code>save.dat</code> once, to edit the JSON
+    <p> Alternatively, you can download the raw data after uploading your <code>save.dat</code> once and edit the JSON
         values using a text or online editor. Then, upload the modified <code>save.json</code> file and download it as a
         <code>save.dat</code> file.
     </p>
-    <input type="file" id="fileInput">Upload a <code>save.dat</code> or <code>save.json</code> file
+    <input type="file" id="fileInput" accept='.dat,.json'>Upload a <code>save.dat</code> or <code>save.json</code> file
+    <br>
+    <select id="profileSelect" hidden></select>
     <br>
     <div id="data">
         <div style="margin-right: 1.5em">
@@ -81,6 +83,10 @@
         </div>
         <div style="margin-right: 1.5em">
             <table id="scrolls"></table>
+            <br>
+            <table id="equipment"></table>
+            <br>
+            <table id="crafted_leaves"></table>
             <!--table id="relics"></table-->
         </div>
     </div>

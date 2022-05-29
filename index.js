@@ -1,5 +1,3 @@
-let currentSave;
-
 const leaves = [
     {
         name: "Gems",
@@ -242,6 +240,10 @@ const leaves = [
     },
 ];
 
+let currentSave;
+let currentProfile;
+
+
 document.addEventListener("DOMContentLoaded", () => {
     let fileInput = document.getElementById("fileInput");
 
@@ -372,7 +374,15 @@ function test(data) {
 function processSave(currentSave) {
     console.log(currentSave);
 
-    let profile = currentSave.profiles[currentSave.current_profile];
+    setupProfileSelect();
+    createTables();
+
+    document.getElementById("saveButton").hidden = false;
+    document.getElementById("saveRawButton").hidden = false;
+}
+
+function createTables() {
+    let profile = currentSave.profiles[currentProfile];
 
     let resourceTable = document.getElementById("resources");
     while (resourceTable.firstChild) {
@@ -526,7 +536,7 @@ function processSave(currentSave) {
 
         artifactTable.appendChild(
             createRow(
-                capitalize(key.replace("_", " ")),
+                pretty(key),
                 makeIn("shown"),
                 makeIn("collected"),
                 makeIn("count"),
@@ -535,30 +545,129 @@ function processSave(currentSave) {
         );
     }
 
-    createAmountTable("chests", "Chest Rarity", profile.chests);
-    createAmountTable("materials", "Material", profile.materials);
-    createAmountTable("scrolls", "Scroll Type", profile.scrolls);
+    createAmountTable("chests", "Chest Rarity", profile.chests, true);
+    createAmountTable("materials", "Material", profile.materials, false);
+    createAmountTable("scrolls", "Scroll Type", profile.scrolls, true);
+    createAmountTable("equipment", "Equipment", profile.equipment, false);
+    loadCraftedLeaves(profile);
     // createAmountTable("relics", "Relic", profile.relics); too long
-
-
-    document.getElementById("saveButton").hidden = false;
-    document.getElementById("saveRawButton").hidden = false;
 }
 
-function createAmountTable(id, title, data) {
+function loadCraftedLeaves(profile) {
+    let table = document.getElementById("crafted_leaves");
+    while (table.firstChild) {
+        table.removeChild(table.firstChild);
+    }
+
+    for (const leaf of [...profile.crafted_leaves, ...profile.crafted_backpack]) {
+        let name = document.createElement("label");
+        name.innerText = pretty(leaf.type_key) + " Leaf";
+        name.style.fontWeight = "bold";
+
+        let props = [];
+        for (const ability in leaf.props) {
+            let label = document.createElement("label");
+            label.innerText = pretty(ability);
+
+            let amount = document.createElement("input");
+            amount.setAttribute("type", "number");
+
+            const isNormalAbility = typeof leaf.props[ability] === "number";
+            let resource = "";
+
+            if (isNormalAbility) {
+                amount.value = leaf.props[ability];
+            } else { // leaf-specific ability
+                resource = leaf.props[ability].__resource_key;
+                amount.value = leaf.props[ability][resource];
+                label.innerText += ` (${pretty(resource)} Leaves)`;
+            }
+
+            amount.addEventListener("change", () => {
+                let value = amount.valueAsNumber;
+
+                if (isNormalAbility)
+                    leaf.props[ability] = value;
+                else
+                    leaf.props[ability][resource] = value;
+            });
+
+            props.push({ label, amount });
+        }
+
+        table.appendChild(createRow(name, ""));
+        for (const ability of props) {
+            table.appendChild(createRow(ability.label, ability.amount));
+        }
+
+        let tr = document.createElement("tr");
+        tr.style.lineHeight = "0.75em";
+        tr.style.columnSpan = "2";
+        tr.innerHTML = "&nbsp;";
+        table.appendChild(tr); // empty row
+    }
+}
+
+function pretty(str) {
+    let res = str.replace(/_/g, " ")
+    return capitalize(res)
+        .replace(/mlc/gi, "MLC")
+        .replace(/blc/gi, "BLC")
+        .replace(/hp/gi, "HP");
+}
+
+const expected_profiles = [
+    {
+        key: "def",
+        name: "Default Profile",
+    },
+    {
+        key: "challenge",
+        name: "Active Challenge",
+    },
+];
+
+function setupProfileSelect() {
+    let select = document.getElementById("profileSelect");
+    while (select.firstChild) {
+        select.removeChild(select.firstChild);
+    }
+
+    for (const key in currentSave.profiles) {
+        let option = document.createElement("option");
+        option.value = key;
+        option.innerText = expected_profiles.find((x) => x.key === key)?.name || key;
+        select.appendChild(option);
+    }
+    select.value = currentProfile = currentSave.current_profile;
+    select.addEventListener("change", () => {
+        currentProfile = select.value;
+        createTables();
+    });
+
+    select.hidden = false;
+
+}
+
+function createAmountTable(id, title, data, doUnlocks) {
     let table = document.getElementById(id);
     while (table.firstChild) {
         table.removeChild(table.firstChild);
     }
-    table.appendChild(createRow(title, "Amount", "Unlocked"));
 
-    for(const key in data) {
+    if (doUnlocks)
+        table.appendChild(createRow(title, "Amount", "Unlocked"));
+    else
+        table.appendChild(createRow(title, "Amount"));
+
+    for (const key in data) {
         let item = data[key];
 
         let amount = document.createElement("input");
         amount.setAttribute("type", "number");
         amount.value = item.count;
-        amount.disabled = !item.unlocked;
+
+        if (doUnlocks) amount.disabled = !item.unlocked;
 
         amount.addEventListener("change", () => {
             let value = amount.valueAsNumber;
@@ -578,11 +687,10 @@ function createAmountTable(id, title, data) {
             item.unlocked = unlock.checked;
         });
 
-        table.appendChild(createRow(
-            capitalize(key.replace("_", " ")),
-            amount,
-            unlock
-        ));
+        if (doUnlocks)
+            table.appendChild(createRow(pretty(key), amount, unlock));
+        else
+            table.appendChild(createRow(pretty(key), amount));
     }
 }
 

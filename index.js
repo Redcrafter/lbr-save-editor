@@ -535,8 +535,55 @@ function processSave(currentSave) {
         );
     }
 
+    createAmountTable("chests", "Chest Rarity", profile.chests);
+    createAmountTable("materials", "Material", profile.materials);
+    createAmountTable("scrolls", "Scroll Type", profile.scrolls);
+    // createAmountTable("relics", "Relic", profile.relics); too long
+
+
     document.getElementById("saveButton").hidden = false;
     document.getElementById("saveRawButton").hidden = false;
+}
+
+function createAmountTable(id, title, data) {
+    let table = document.getElementById(id);
+    while (table.firstChild) {
+        table.removeChild(table.firstChild);
+    }
+    table.appendChild(createRow(title, "Amount", "Unlocked"));
+
+    for(const key in data) {
+        let item = data[key];
+
+        let amount = document.createElement("input");
+        amount.setAttribute("type", "number");
+        amount.value = item.count;
+        amount.disabled = !item.unlocked;
+
+        amount.addEventListener("change", () => {
+            let value = amount.valueAsNumber;
+
+            let change = value - item.count;
+
+            item.count = value;
+            item.collected += change;
+            item.collected_total += change;
+        });
+
+        let unlock = document.createElement("input");
+        unlock.type = "checkbox";
+        unlock.checked = item.unlocked;
+        unlock.addEventListener("input", () => {
+            amount.disabled = !unlock.checked;
+            item.unlocked = unlock.checked;
+        });
+
+        table.appendChild(createRow(
+            capitalize(key.replace("_", " ")),
+            amount,
+            unlock
+        ));
+    }
 }
 
 function loadDat(data) {

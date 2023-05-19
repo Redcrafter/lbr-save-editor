@@ -243,7 +243,6 @@ const leaves = [
 let currentSave;
 let currentProfile;
 
-
 document.addEventListener("DOMContentLoaded", () => {
     let fileInput = document.getElementById("fileInput");
 
@@ -260,6 +259,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("saveButton").addEventListener("click", save);
     document.getElementById("saveRawButton").addEventListener("click", saveRaw);
 });
+
+window.onerror = (error) => {
+    alert(`An Unexpected Error Occurred. Please open an issue on github.\n${error}`); 
+};
 
 /** @param  {...number} items */
 function createRow(...items) {
@@ -366,7 +369,7 @@ function test(data) {
     let hash = SHA1_hmac(saveStr, "ke03m!5ng93nan7p24lyg343nml2o591");
 
     if (origHash !== hash) {
-        alert("Hash test failed.\nThe save editor is no longer working.");
+        alert("Hash test failed.\nThe save editor is no longer working. Please open an issue on github.");
     }
 }
 
@@ -578,7 +581,7 @@ function loadCraftedLeaves(profile) {
             if (isNormalAbility) {
                 amount.value = leaf.props[ability];
             } else { // leaf-specific ability
-                resource = leaf.props[ability].__resource_key;
+                resource = leaf.props[ability].__resource_key ?? leaf.props[ability].__collection_key;
                 amount.value = leaf.props[ability][resource];
                 label.innerText += ` (${pretty(resource)} Leaves)`;
             }

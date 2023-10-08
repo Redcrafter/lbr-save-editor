@@ -261,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.onerror = (error) => {
-    alert(`An Unexpected Error Occurred. Please open an issue on github.\n${error}`); 
+    alert(`An Unexpected Error Occurred. Please open an issue on github.\n${error}`);
 };
 
 /** @param  {...number} items */
@@ -568,31 +568,47 @@ function loadCraftedLeaves(profile) {
         name.style.fontWeight = "bold";
 
         let props = [];
-        for (const ability in leaf.props) {
+        for (const a_name in leaf.props) {
+            const ability = leaf.props[a_name];
+
             let label = document.createElement("label");
-            label.innerText = pretty(ability);
+            label.innerText = pretty(a_name);
 
             let amount = document.createElement("input");
             amount.setAttribute("type", "number");
 
-            const isNormalAbility = typeof leaf.props[ability] === "number";
+            const isBig = ability?.startsWith?.("@i64@");
+            const isNormalAbility = typeof ability === "number";
             let resource = "";
 
-            if (isNormalAbility) {
-                amount.value = leaf.props[ability];
+            if (isBig) {
+                amount.setAttribute("type", "text");
+                amount.setAttribute("pattern", "-?\\d+");
+
+                amount.value = BigInt("0x" + ability.substring(5, ability.length - 5)).toString();
+            } else if (isNormalAbility) {
+                amount.setAttribute("step", "any");
+                amount.value = ability;
             } else { // leaf-specific ability
-                resource = leaf.props[ability].__resource_key ?? leaf.props[ability].__collection_key;
-                amount.value = leaf.props[ability][resource];
+                amount.setAttribute("step", "any");
+                resource = ability.__resource_key ?? ability.__collection_key;
+                amount.value = ability[resource];
                 label.innerText += ` (${pretty(resource)} Leaves)`;
             }
 
             amount.addEventListener("change", () => {
-                let value = amount.valueAsNumber;
-
-                if (isNormalAbility)
-                    leaf.props[ability] = value;
+                if (isBig) {
+                    try {
+                        let v = BigInt(amount.value);
+                        leaf.props[a_name] = `@i64@${BigInt.asUintN(64, v).toString(16)}\$i64\$`;
+                        amount.value = BigInt.asIntN(64, v);
+                    } catch (error) {
+                        alert("Invalid number format");
+                    }
+                } else if (isNormalAbility)
+                    leaf.props[a_name] = amount.valueAsNumber;
                 else
-                    leaf.props[ability][resource] = value;
+                    ability[resource] = amount.valueAsNumber;
             });
 
             props.push({ label, amount });
